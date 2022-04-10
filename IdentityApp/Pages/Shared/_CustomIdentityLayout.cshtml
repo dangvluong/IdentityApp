@@ -16,7 +16,8 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/Identity/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/qrcode.min.js"></script>
+    @*<script src="~/js/qrcode.min.js"></script>*@
+    <link href="~/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
     <nav class="navbar navbar-dark bg-secondary">
@@ -27,7 +28,7 @@
         @RenderBody()
         @await RenderSectionAsync("Scripts", required: false)
     </div>
-    <script type="text/javascript">
+    @*<script type="text/javascript">
         var element = document.getElementById("qrCode");
         if (element !== null) {
             new QRCode(element, {
@@ -36,6 +37,6 @@
             });
             element.previousElementSibling?.remove();
         }
-    </script>
+    </script>*@
 </body>
 </html>

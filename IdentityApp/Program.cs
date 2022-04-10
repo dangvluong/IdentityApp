@@ -11,7 +11,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ProductDbContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnectionString"))
 );
-
+//builder.Services.AddDbContext<IdentityDbContext>(options =>
+//    options.UseSqlServer(connectionString));
 
 builder.Services.AddDbContext<IdentityDbContext>(opts =>
 {
