@@ -9,7 +9,7 @@ namespace IdentityApp.Services
             System.Console.WriteLine("---New Email----");
             System.Console.WriteLine($"To: {emailAddress}");
             System.Console.WriteLine($"Subject: {subject}");
-            System.Console.WriteLine(HttpUtility.HtmlDecode(htmlMessage));
+            System.Console.WriteLine($"{HttpUtility.HtmlDecode(htmlMessage)}");
             System.Console.WriteLine("-------");
             return Task.CompletedTask;
         }

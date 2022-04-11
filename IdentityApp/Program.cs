@@ -32,7 +32,10 @@ builder.Services.AddIdentity<IdentityUser,IdentityRole>(opts =>
     opts.SignIn.RequireConfirmedAccount = true;
 
 })
-.AddEntityFrameworkStores<IdentityDbContext>();
+.AddEntityFrameworkStores<IdentityDbContext>()
+.AddDefaultTokenProviders();
+builder.Services.AddScoped<TokenUrlEncoderService>();
+builder.Services.AddScoped<IdentityEmailService>();
 builder.Services.AddAuthentication().AddGoogle(opts =>
 {
     opts.ClientId = builder.Configuration["Google:ClientId"];
@@ -42,7 +45,14 @@ builder.Services.AddAuthentication().AddGoogle(opts =>
     opts.AppId = builder.Configuration["Facebook:AppId"];
     opts.AppSecret = builder.Configuration["Facebook:AppSecret"];
 });
-;
+
+builder.Services.ConfigureApplicationCookie(opts => {
+    opts.LoginPath = "/Identity/SignIn";
+    opts.LogoutPath = "/Identity/SignOut";
+    opts.AccessDeniedPath = "/Identity/Forbidden";    
+});
+
+
 builder.Services.AddHttpsRedirection(opts =>
 {
     opts.HttpsPort = 44350;
