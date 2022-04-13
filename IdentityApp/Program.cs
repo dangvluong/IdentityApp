@@ -76,5 +76,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapDefaultControllerRoute();
     endpoints.MapRazorPages();
 });
+app.SeedUserStoreForDashboard();
 app.SeedDataToDb();
 app.Run();

@@ -5,13 +5,18 @@ namespace IdentityApp.Pages.Identity.Admin
 {
     public class DashboardModel : AdminPageModel
     {
+        public DashboardModel(UserManager<IdentityUser> userMgr, IConfiguration configuration)
+        {
+            UserManager = userMgr;
+            DashboardRole = configuration["Dashboard:Role"] ?? "Dashboard";
+        }
+        public string DashboardRole { get; set; }
         public int UsersCount { get; set; } = 0;
         public int UsersUnconfirmed { get; set; } = 0;
         public int UsersLockedout { get; set; } = 0;
         public int UsersTwoFactor { get; set; } = 0;
 
-        public UserManager<IdentityUser> UserManager { get; set; }
-        public DashboardModel(UserManager<IdentityUser> userMgr) => UserManager = userMgr;
+        public UserManager<IdentityUser> UserManager { get; set; }       
         private readonly string[] emails = { "alice@example.com", "bob@example.com", "charlie@example.com" };
         public void OnGet()
         {
@@ -23,8 +28,11 @@ namespace IdentityApp.Pages.Identity.Admin
         {
             foreach (IdentityUser existingUser in UserManager.Users.ToList())
             {
-                IdentityResult result = await UserManager.DeleteAsync(existingUser);
-                result.Process(ModelState);
+                if (emails.Contains(existingUser.Email) || !await UserManager.IsInRoleAsync(existingUser, DashboardRole))
+                {
+                    IdentityResult result = await UserManager.DeleteAsync(existingUser);
+                    result.Process(ModelState);
+                }
             }
             foreach (string email in emails)
             {
