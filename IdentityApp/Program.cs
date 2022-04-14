@@ -43,7 +43,7 @@ builder.Services.AddScoped<IdentityEmailService>();
 builder.Services.AddAuthentication().AddGoogle(opts =>
 {
     opts.ClientId = builder.Configuration["Google:ClientId"];
-    opts.ClientSecret = builder.Configuration["Google:ClientSecret"];
+    opts.ClientSecret = builder.Configuration["Google:ClientSecret"];    
 }).AddFacebook(opts =>
 {
     opts.AppId = builder.Configuration["Facebook:AppId"];
