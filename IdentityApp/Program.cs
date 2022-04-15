@@ -1,10 +1,14 @@
 using IdentityApp;
 using IdentityApp.Models;
 using IdentityApp.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMvc();
 builder.Services.AddRazorPages();
@@ -40,20 +44,29 @@ builder.Services.Configure<SecurityStampValidatorOptions>(opts => {
 });
 builder.Services.AddScoped<TokenUrlEncoderService>();
 builder.Services.AddScoped<IdentityEmailService>();
-builder.Services.AddAuthentication().AddGoogle(opts =>
-{
-    opts.ClientId = builder.Configuration["Google:ClientId"];
-    opts.ClientSecret = builder.Configuration["Google:ClientSecret"];    
-}).AddFacebook(opts =>
-{
-    opts.AppId = builder.Configuration["Facebook:AppId"];
-    opts.AppSecret = builder.Configuration["Facebook:AppSecret"];
+builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts => {
+    opts.TokenValidationParameters.ValidateAudience = false;
+    opts.TokenValidationParameters.ValidateIssuer = false;
+    opts.TokenValidationParameters.IssuerSigningKey
+    = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+    builder.Configuration["BearerTokens:Key"]));
 });
+//    .AddGoogle(opts =>
+//{
+//    opts.ClientId = builder.Configuration["Google:ClientId"];
+//    opts.ClientSecret = builder.Configuration["Google:ClientSecret"];    
+//}).AddFacebook(opts =>
+//{
+//    opts.AppId = builder.Configuration["Facebook:AppId"];
+//    opts.AppSecret = builder.Configuration["Facebook:AppSecret"];
+//});
 
 builder.Services.ConfigureApplicationCookie(opts => {
     opts.LoginPath = "/Identity/SignIn";
     opts.LogoutPath = "/Identity/SignOut";
-    opts.AccessDeniedPath = "/Identity/Forbidden";    
+    opts.AccessDeniedPath = "/Identity/Forbidden";
+    opts.Events.DisableRedirectionForApiClients();
+
 });
 
 
@@ -62,6 +75,16 @@ builder.Services.AddHttpsRedirection(opts =>
     opts.HttpsPort = 44350;
 });
 
+builder.Services.AddCors(opts =>
+{
+    opts.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:5100")
+        .AllowAnyHeader()
+       .AllowAnyMethod()
+       .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -69,6 +92,7 @@ app.UseHttpsRedirection();
 app.UseDeveloperExceptionPage();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
